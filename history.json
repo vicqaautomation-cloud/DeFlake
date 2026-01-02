@@ -5,5 +5,12 @@
     "html_path": "/Users/hugo/Documents/Personal/DeFlake/deflake_context/snapshot_1767364949.html",
     "fix": "/* DeFlake Mock Response */\n/* The button ID changed from #submit-button to .btn-primary-2026 */\nbutton[data-testid='submit-btn']",
     "status": "Applied"
+  },
+  {
+    "timestamp": "2026-01-02T09:13:05.010907",
+    "log_path": "/Users/hugo/Documents/Personal/DeFlake/deflake_context/error_1767366782.log",
+    "html_path": "/Users/hugo/Documents/Personal/DeFlake/deflake_context/snapshot_1767366782.html",
+    "fix": "    page.click(\"button[data-testid='submit-btn']\")",
+    "status": "Applied"
   }
 ]

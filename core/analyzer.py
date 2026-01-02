@@ -1,6 +1,8 @@
 import os
 from bs4 import BeautifulSoup
 
+import re
+
 class ErrorAnalyzer:
     def __init__(self, log_path: str, html_path: str):
         self.log_path = log_path
@@ -30,3 +32,14 @@ class ErrorAnalyzer:
         if len(text_content) > max_length:
             return text_content[:max_length] + "...[TRUNCATED]"
         return text_content
+
+    def extract_location(self) -> tuple[str, int]:
+        """
+        Parses the log file to find 'Location: /path/to/file.py:42'
+        Returns (file_path, line_number) or (None, None)
+        """
+        content = self.read_log()
+        match = re.search(r"Location: (.+):(\d+)", content)
+        if match:
+            return match.group(1), int(match.group(2))
+        return None, None

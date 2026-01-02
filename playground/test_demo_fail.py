@@ -18,4 +18,4 @@ def test_login_failure(page: Page):
     print("\nAttempting to click '#submit-button' (which does not exist)...")
     
     # We set a short timeout so we don't wait 30s
-    page.click("#submit-button", timeout=2000) 
+    page.click("button[data-testid='submit-btn']")

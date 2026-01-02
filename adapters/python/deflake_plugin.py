@@ -27,8 +27,25 @@ def pytest_runtest_makereport(item, call):
                 html_path = os.path.join(context_dir, f"snapshot_{timestamp}.html")
                 
                 # Save Error Log
+                # Extract location from the *last* interesting entry in the traceback
+                # call.excinfo.traceback[-1] is usually the failure point
+                # But we want the test file, not the internal library
+                
+                failure_path = str(call.excinfo.traceback[-1].path)
+                failure_line = call.excinfo.traceback[-1].lineno + 1 # 0-indexed
+                
+                # Iterate back to find the actual test file if the error is deep in a lib
+                for entry in reversed(call.excinfo.traceback):
+                    if str(entry.path) == str(item.fspath):
+                        failure_path = str(entry.path)
+                        failure_line = entry.lineno + 1
+                        break
+
+                log_content = f"Location: {failure_path}:{failure_line}\n"
+                log_content += f"Error: {call.excinfo.value}\n"
+                
                 with open(log_path, "w") as f:
-                    f.write(str(call.excinfo.value))
+                    f.write(log_content)
                 
                 # Save HTML Snapshot
                 # We need to run this synchronously to ensure file exists before CLI runs
@@ -51,7 +68,8 @@ def pytest_runtest_makereport(item, call):
                     sys.executable, core_script,
                     "--log", log_path,
                     "--html", html_path,
-                    "--mock" # Force mock mode for now
+                    "--mock", # Force mock mode for now
+                    "--apply" # Auto-patch for demo
                 ]
                 
                 subprocess.run(cmd)
