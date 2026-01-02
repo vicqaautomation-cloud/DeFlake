@@ -13,7 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt && \
 COPY core/ ./core/
 COPY dashboard/ ./dashboard/
 COPY adapters/ ./adapters/
-COPY .env .
 
 # Expose port
 EXPOSE 8000
