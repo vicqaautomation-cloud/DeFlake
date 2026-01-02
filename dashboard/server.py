@@ -38,6 +38,11 @@ class HealRequest(BaseModel):
     html_snapshot: str
     failing_line: str = None
 
+@app.get("/")
+def health_check():
+    """Health check for Railway."""
+    return {"status": "online", "message": "DeFlake API is running"}
+
 @app.post("/api/deflake")
 def deflake_endpoint(request: HealRequest, api_key: str = Security(get_api_key)):
     """
