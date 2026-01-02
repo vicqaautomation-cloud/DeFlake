@@ -1,0 +1,5 @@
+langchain
+langchain-openai
+beautifulsoup4
+click
+python-dotenv

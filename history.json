@@ -1,0 +1,9 @@
+[
+  {
+    "timestamp": "2026-01-02T08:42:31.677729",
+    "log_path": "/Users/hugo/Documents/Personal/DeFlake/deflake_context/error_1767364949.log",
+    "html_path": "/Users/hugo/Documents/Personal/DeFlake/deflake_context/snapshot_1767364949.html",
+    "fix": "/* DeFlake Mock Response */\n/* The button ID changed from #submit-button to .btn-primary-2026 */\nbutton[data-testid='submit-btn']",
+    "status": "Applied"
+  }
+]

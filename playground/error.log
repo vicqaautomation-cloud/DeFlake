@@ -1,0 +1,15 @@
+Error: Playwright Test Failed.
+
+Location: tests/test_login.py:42
+Error Message:
+    TimeoutError: waiting for selector "#submit-button"
+    
+    Element not found after 30000ms.
+    
+    div#app
+      > form.login-form
+        > input#username
+        > input#password
+        > button.btn-primary-2026 (FOUND)
+        
+    Expected selector "#submit-button" was not found in the DOM.
