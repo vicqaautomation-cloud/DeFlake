@@ -1,0 +1,5 @@
+Location: /Users/hugo/Documents/Personal/DeFlake/playground/test_demo_fail.py:21
+Error: Page.click: Timeout 2000ms exceeded.
+Call log:
+  - waiting for locator("#submit-button")
+

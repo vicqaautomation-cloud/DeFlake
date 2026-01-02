@@ -3,3 +3,6 @@ langchain-openai
 beautifulsoup4
 click
 python-dotenv
+fastapi
+uvicorn
+python-multipart
