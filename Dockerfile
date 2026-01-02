@@ -19,4 +19,4 @@ COPY adapters/ ./adapters/
 EXPOSE 8000
 
 # Run the server using the PORT environment variable provided by Railway (default 8000)
-CMD sh -c "uvicorn dashboard.server:app --host 0.0.0.0 --port ${PORT:-8000}"
+CMD ["python", "dashboard/server.py"]
