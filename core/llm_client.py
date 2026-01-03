@@ -49,7 +49,7 @@ class LLMClient:
             "3. Unique Class combinations.\n"
             "4. Accessibility attributes (aria-label, placeholder).\n"
             "5. Text content (e.g., text='Login').\n"
-            "6. XPath (ONLY as a last resort).\n"
+            "6. XPath (ONLY as a last resort, and MUST be relative/attribute-based. NEVER return absolute XPaths like /html/body...).\n"
             "Return ONLY the code/selector. Do not add markdown blocks."
         )
 
