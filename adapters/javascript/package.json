@@ -1,13 +1,24 @@
 {
-  "name": "javascript",
+  "name": "deflake",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI-powered self-healing tool for Playwright, Cypress, and WebdriverIO tests.",
+  "main": "client.js",
+  "bin": {
+    "deflake": "cli.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "playwright",
+    "cypress",
+    "webdriverio",
+    "ai",
+    "self-healing",
+    "automation",
+    "testing"
+  ],
+  "author": "VicQA Automation Cloud",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
