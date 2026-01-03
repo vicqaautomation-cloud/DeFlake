@@ -3,9 +3,11 @@ __pycache__/
 *.pyc
 node_modules/
 .DS_Store
-demo-project/
 demo-cypress/
 docs/
 docs/
 Roadmap_2026.md
 demo-wdio/
+Startup_2026_Blueprint.md
+github_setup_guide.md
+troubleshooting_openai.md
