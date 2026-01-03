@@ -50,7 +50,9 @@ class LLMClient:
             "4. Accessibility attributes (aria-label, placeholder).\n"
             "5. Text content (e.g., text='Login').\n"
             "6. XPath (ONLY as a last resort, and MUST be relative/attribute-based. NEVER return absolute XPaths like /html/body...).\n"
-            "Return ONLY the code/selector. Do not add markdown blocks."
+            "If the element cannot be confidently located (e.g., completely dynamic, no stable attributes, or ambiguous),\n"
+            "return EXACTLY this string format: '⚠️ UNABLE TO FIX: [Reason]. Please ask developers to add a data-testid to this element.'\n"
+            "Return ONLY the code/selector or the failure message."
         )
 
         user_content = f"Error Log:\n{error_log}\n\nHTML Snapshot:\n{html_snapshot}"
