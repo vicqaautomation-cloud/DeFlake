@@ -5,3 +5,6 @@ node_modules/
 .DS_Store
 demo-project/
 demo-cypress/
+docs/
+docs/
+Roadmap_2026.md
