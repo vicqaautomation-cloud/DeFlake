@@ -1,6 +1,41 @@
 import React, { useState } from 'react';
-import { Terminal, CheckCircle2, Play, Code2, Copy, Github, ExternalLink } from 'lucide-react';
+import { Terminal, CheckCircle2, Play, Code2, Copy, Github, ExternalLink, Apple, Monitor } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+function SetupTabs() {
+  const [os, setOs] = useState('mac');
+
+  const commands = {
+    mac: `export DEFLAKE_API_KEY="your-api-key"
+export DEFLAKE_API_URL="https://deflake-api.up.railway.app"`,
+    win: `$env:DEFLAKE_API_KEY="your-api-key"
+$env:DEFLAKE_API_URL="https://deflake-api.up.railway.app"`
+  };
+
+  return (
+    <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-1">
+      <div className="flex gap-1 mb-4 border-b border-zinc-800 p-2">
+        <button
+          onClick={() => setOs('mac')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${os === 'mac' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+        >
+          <Apple size={16} /> macOS / Linux
+        </button>
+        <button
+          onClick={() => setOs('win')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${os === 'win' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+        >
+          <Monitor size={16} /> Windows
+        </button>
+      </div>
+      <div className="p-4 pt-0">
+        <pre className="font-mono text-sm text-zinc-300 overflow-x-auto">
+          <code>{commands[os]}</code>
+        </pre>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [activeTab, setActiveTab] = useState('playwright');
@@ -73,6 +108,18 @@ services: [
           </div>
         </motion.div>
       </header>
+
+      {/* Quick Setup Section */}
+      <section className="py-12 bg-zinc-900/50 border-y border-zinc-800">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <h3 className="text-xl font-semibold mb-2">Configure for your OS</h3>
+            <p className="text-zinc-400 text-sm">DeFlake works on all platforms. Set your API Key to get started.</p>
+          </div>
+
+          <SetupTabs />
+        </div>
+      </section>
 
       {/* Interactive Terminal Demo */}
       <section id="demo" className="py-20 bg-surface/30 border-y border-zinc-800">
