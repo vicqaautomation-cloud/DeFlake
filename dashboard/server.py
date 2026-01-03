@@ -25,13 +25,49 @@ app.add_middleware(
 )
 
 # Security
+# Security & Middleware
 API_KEY_NAME = "X-API-KEY"
+BYOK_HEADER = "X-OPENAI-KEY"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
-async def get_api_key(api_key_header: str = Security(api_key_header)):
-    if api_key_header == os.getenv("DEFLAKE_API_KEY", "test-secret-key"):
-        return api_key_header
-    raise HTTPException(status_code=403, detail="Could not validate credentials")
+# Load master key from env for backward compatibility/admin
+MASTER_KEY = os.getenv("DEFLAKE_API_KEY", "test-secret-key")
+
+from dashboard.database import get_user, increment_usage, create_user
+
+async def verify_quota_and_key(
+    api_key: str = Security(api_key_header), 
+    openai_key: str = Header(None, alias=BYOK_HEADER)
+):
+    """
+    Validates API Key and Check Quota.
+    Logic:
+    1. If X-OPENAI-KEY is present -> BYOK Mode (Skip quota, validate DeFlake key exists).
+    2. If normal request -> Check quota in DB.
+    """
+    if not api_key:
+        raise HTTPException(status_code=403, detail="Missing API Key")
+
+    # Master Key Bypass (Admin)
+    if api_key == MASTER_KEY:
+        return {"type": "master", "key": api_key, "byok": openai_key}
+
+    user = get_user(api_key)
+    if not user:
+        raise HTTPException(status_code=403, detail="Invalid API Key")
+
+    # BYOK Mode: Unlimited usage, but must have valid account
+    if openai_key:
+        return {"type": "byok", "key": api_key, "byok": openai_key}
+
+    # Standard Mode: Check Quota
+    if user["usage_count"] >= user["limit_count"]:
+        raise HTTPException(
+            status_code=402, 
+            detail=f"Quota Exceeded ({user['usage_count']}/{user['limit_count']}). Upgrade to Pro or use BYOK."
+        )
+
+    return {"type": "standard", "key": api_key, "byok": None}
 
 class HealRequest(BaseModel):
     error_log: str
@@ -43,18 +79,51 @@ def health_check():
     """Health check for Railway."""
     return {"status": "online", "message": "DeFlake API is running"}
 
+@app.post("/api/register")
+def register_user(tier: str = "free"):
+    """Generates a new API Key for a user."""
+    key = create_user(tier)
+    return {"api_key": key, "tier": tier, "limit": 20 if tier == 'free' else 1000}
+
+@app.get("/api/user/usage")
+def get_usage(creds: dict = Security(verify_quota_and_key)):
+    if creds["type"] == "master":
+        return {"tier": "admin", "usage": 0, "limit": 999999}
+    
+    user = get_user(creds["key"])
+    return {
+        "tier": user["tier"],
+        "usage": user["usage_count"],
+        "limit": user["limit_count"]
+    }
+
 @app.post("/api/deflake")
-def deflake_endpoint(request: HealRequest, api_key: str = Security(get_api_key)):
+def deflake_endpoint(request: HealRequest, creds: dict = Security(verify_quota_and_key)):
     """
     SaaS Endpoint: Accepts context, returns fix.
     """
-    print(f"🚑 Received healing request from client. Key: {api_key[:4]}***")
+    print(f"🚑 Received healing request. Type: {creds['type']}")
     
-    # We use mock=True for the demo, but in prod this would use the real key
-    client = LLMClient(mock=True)
-    fix = client.heal(request.error_log, request.html_snapshot, request.failing_line)
+    # Initialize Client
+    # If BYOK, we pass the user's OpenAI Key
+    # If Standard, we rely on server's env key (LLMClient handles this)
+    openai_key = creds.get("byok")
     
-    return {"fix": fix, "status": "success"}
+    # We use mock=True for the demo unless OpenAI key is present (real or BYOK)
+    # Actually, LLMClient handles env logic. We just need to pass the explicit key if BYOK.
+    client = LLMClient(mock=False, openai_api_key=openai_key)
+    
+    try:
+        fix = client.heal(request.error_log, request.html_snapshot, request.failing_line)
+        
+        # Increment usage ONLY if it wasn't a BYOK request and wasn't Master
+        if creds["type"] == "standard":
+            increment_usage(creds["key"])
+            
+        return {"fix": fix, "status": "success"}
+    except Exception as e:
+        print(f"Error during healing: {e}")
+        return {"fix": str(e), "status": "error"}
 
 HISTORY_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "history.json")
 
@@ -72,6 +141,10 @@ def get_history():
 
 if __name__ == "__main__":
     import uvicorn
+    # Init DB on startup
+    from dashboard.database import init_db
+    init_db()
+    
     port = int(os.environ.get("PORT", 8000))
     print(f"🚀 Starting DeFlake API on 0.0.0.0:{port}")
     uvicorn.run(app, host="0.0.0.0", port=port)

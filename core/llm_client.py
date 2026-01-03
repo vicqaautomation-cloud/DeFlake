@@ -7,18 +7,23 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 class LLMClient:
-    def __init__(self, mock: bool = False):
+    def __init__(self, mock: bool = False, openai_api_key: str = None):
         self.mock = mock
         if not self.mock:
-            api_key = os.getenv("OPENAI_API_KEY")
+            # Use provided key (BYOK) or fallback to env (SaaS Owner)
+            api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
+            
             if not api_key:
-                raise ValueError("OPENAI_API_KEY not found in environment variables.")
-            try:
-                self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
-            except Exception:
-                # Fallback to mock if init fails (e.g. auth error, though lazy init usually prevents this)
-                print("⚠️  Warning: Failed to initialize OpenAI. Switching to Mock Mode.")
+                # raise ValueError("OPENAI_API_KEY not found in environment variables.")
+                print("⚠️  Warning: No OpenAI Key found. Switching to Mock Mode.")
                 self.mock = True
+            else:
+                try:
+                    self.llm = ChatOpenAI(model="gpt-4o", temperature=0, api_key=api_key)
+                except Exception:
+                    # Fallback to mock if init fails
+                    print("⚠️  Warning: Failed to initialize OpenAI. Switching to Mock Mode.")
+                    self.mock = True
 
     def heal(self, error_log: str, html_snapshot: str, failing_line: str = None) -> str:
         """
