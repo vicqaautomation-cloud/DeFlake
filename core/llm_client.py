@@ -43,7 +43,14 @@ class LLMClient:
             "Identify the target element in the HTML.\n"
             "If a failing line is provided, return the COMPLETE NEW LINE of code to replace it.\n"
             "If no failing line is provided, return just the CSS selector.\n"
-            "Return ONLY the code/selector. No markdown, no explanations."
+            "PRIORITIZE robust selectors in this order:\n"
+            "1. data-testid or data-cy attributes (Best practice).\n"
+            "2. Unique IDs (if likely stable, avoid dynamic IDs like user-123).\n"
+            "3. Unique Class combinations.\n"
+            "4. Accessibility attributes (aria-label, placeholder).\n"
+            "5. Text content (e.g., text='Login').\n"
+            "6. XPath (ONLY as a last resort).\n"
+            "Return ONLY the code/selector. Do not add markdown blocks."
         )
 
         user_content = f"Error Log:\n{error_log}\n\nHTML Snapshot:\n{html_snapshot}"
