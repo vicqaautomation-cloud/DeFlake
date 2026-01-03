@@ -90,8 +90,8 @@ services: [
                   key={fw}
                   onClick={() => setActiveTab(fw)}
                   className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${activeTab === fw
-                      ? 'bg-zinc-800 text-white border border-zinc-700 shadow-lg'
-                      : 'text-zinc-500 hover:text-zinc-300'
+                    ? 'bg-zinc-800 text-white border border-zinc-700 shadow-lg'
+                    : 'text-zinc-500 hover:text-zinc-300'
                     }`}
                 >
                   {fw}
@@ -121,7 +121,7 @@ services: [
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent opacity-60"></div>
               <Play size={48} className="text-white opacity-80" />
               <p className="absolute bottom-6 left-6 text-sm font-medium text-zinc-300">Watch the verification demo</p>
-              <img src="/complex_scenario_demo_1767400118179.webp" className="w-full h-full object-cover opacity-50" onError={(e) => e.target.style.display = 'none'} />
+              <img src={`${import.meta.env.BASE_URL}complex_scenario_demo_1767400118179.webp`} className="w-full h-full object-cover opacity-50" onError={(e) => e.target.style.display = 'none'} />
             </div>
           </motion.div>
         </div>
