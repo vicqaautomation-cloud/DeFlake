@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"><link rel="stylesheet" href="/static/prism.css"><link rel="stylesheet" href="/static/style.css"><title>Class Attribute</title><script>function byid(id) 
+{
+    return document.getElementById(id);
+}
+
+function setStatus(txt)
+{
+    byid("opstatus").innerText = txt;
+}</script></head><body><nav class="navbar navbar-expand-lg navbar-light bg-light"><a class="navbar-brand" href="/">UITAP</a><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav mr-auto"><li class="nav-item"><a class="nav-link" href="/home">Home</a></li><li class="nav-item"><a class="nav-link" href="/resources">Resources</a></li></ul></div></nav><section><div class="container"><h3>Class Attribute</h3><p>Class attribute of an element may contain more than one class reference. E.g. </p><pre class=" language-html"><code class=" language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>btn btn-primary btn-test<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span></code></pre> <p>XPath selector relying on a class must be well formed. For example, the following will not work: </p><pre class=" language-bash"><code class=" language-bash">//button[@class='btn-primary']</code></pre><p>Correct variant is</p><pre class=" language-bash"><code class=" language-bash">//button[contains(concat(' ', normalize-space(@class), ' '), ' btn-primary ')]</code></pre><h4>Scenario</h4><ul><li>Record primary (blue) button click and press ok in alert popup.</li><li>Then execute your test to make sure that it can identify the button using <code>btn-primary</code> class.</li></ul><h4>Playground</h4><button class="btn class1 btn-warning btn-test" type="button">Button</button><button class="btn class2 btn-primary btn-test" type="button">Button</button><button class="btn class3 btn-success btn-test" type="button">Button      </button></div></section><script>function ClickEventHandler(event)
+{ 
+    if (("" + event.target.className).indexOf("btn-primary") != -1)
+    {
+        alert("Primary button pressed");
+    }
+} 
+document.body.addEventListener('click', ClickEventHandler, true);         
+</script><div class="container">
+    <footer id="footer">
+        <div id="footer-content">
+            <div id="github">
+                <span></span>
+            </div>
+            <div id="fork">
+                <a href="https://github.com/inflectra/ui-test-automation-playground">Fork the website on GitHub</a>.
+            </div>
+        <div>Supported by <a href="https://www.inflectra.com/Rapise/">Rapise</a> test automation team. Copyright © 2020 <a href="https://www.inflectra.com/">Inflectra Corporation</a>.</div>
+        </div>
+        <div id="license">
+            This work is licensed under the <a rel="license" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
+        </div>
+    </footer>
+</div>
+<script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
+<script src="/static/prism.js"></script>
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body></html>

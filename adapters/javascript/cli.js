@@ -68,13 +68,26 @@ function detectArtifacts(providedLog, providedHtml) {
             files.sort((a, b) => b.time - a.time);
 
             if (files.length > 0) {
-                console.log(`🔎 Auto-detected Artifact: ${path.relative(process.cwd(), files[0].path)}`);
-                htmlPath = files[0].path;
+                // If we found a file in test-results, use it...
+                // UNLESS it's a zip and we have a better HTML report available elsewhere.
+                let candidate = files[0].path;
+
+                if (candidate.endsWith('.zip')) {
+                    // Binary zip is hard to read. Check if there's a standard report first.
+                    const reportPath = path.resolve(process.cwd(), 'playwright-report', 'index.html');
+                    if (fs.existsSync(reportPath)) {
+                        console.log(`🔎 Preferring Standard Report over Trace Zip: playwright-report/index.html`);
+                        candidate = reportPath;
+                    }
+                }
+
+                console.log(`🔎 Auto-detected Artifact: ${path.relative(process.cwd(), candidate)}`);
+                htmlPath = candidate;
             }
         }
     }
 
-    // 2. Fallback: Generic Report
+    // 2. Fallback: Generic Report (Only if still nothing found)
     if (!htmlPath) {
         const commonPaths = [
             'playwright-report/index.html',
@@ -143,35 +156,87 @@ async function runHealer(logContent, htmlPath, apiUrl) {
         finalLogPath = 'error.log';
     }
 
-    // Extract location info from log content if available
-    const failureLocation = logContent ? extractFailureLocation(logContent) : null;
+    // 🧠 SMART CONTEXT: Extract the failing source code if possible
+    const failureLoc = extractFailureLocation(logContent || fs.readFileSync(finalLogPath, 'utf8'));
 
-    const result = await client.heal(finalLogPath, htmlPath);
+    let sourceCodeContent = null;
+    if (failureLoc && failureLoc.fullRootPath) {
+        try {
+            if (fs.existsSync(failureLoc.fullRootPath)) {
+                sourceCodeContent = fs.readFileSync(failureLoc.fullRootPath, 'utf8');
+                console.log(`📄 Reading source file context: ${failureLoc.rootFile}`);
+            }
+        } catch (e) {
+            console.warn("⚠️  Could not read source file:", e.message);
+        }
+    }
 
-    if (result && result.status === 'success') {
-        printDetailedFix(result.fix, failureLocation);
-    } else {
-        console.error("❌ Failed to get a fix.");
-        if (result && result.fix) console.error("   Reason: " + result.fix);
+    try {
+        const result = await client.heal(finalLogPath, htmlPath, failureLoc, sourceCodeContent); // Pass content
+
+        if (result && result.status === 'success') {
+            printDetailedFix(result.fix, failureLoc);
+        } else {
+            console.error("❌ Failed to get a fix.");
+            if (result && result.fix) console.error("   Reason: " + result.fix);
+        }
+    } catch (error) {
+        console.error("❌ Unexpected error:", error.message);
     }
 }
 
-// Helper: Parse Playwright logs to find both Test Start and Error Line
+// Helper: Parse Playwright logs to find Test Start, Root Cause, and Test Step
 function extractFailureLocation(logText) {
+    const loc = {
+        specFile: null,
+        testLine: null,
+        rootFile: null,
+        fullRootPath: null, // New field for full path
+        rootLine: null,
+        stepLine: null
+    };
+
     // 1. Find Test Start (Test Runner Header)
-    // [brave] › .../DocumentFormValidation.spec.ts:63:5 › ...
-    const testMatch = logText.match(/\[.*?\]\s+›\s+(.*?.spec.ts):(\d+):\d+\s+›/);
+    // STRICT MATCH: Must start with "1) [browser] › ..."
+    const testMatch = logText.match(/^\s*\d+\)\s+\[.*?\]\s+›\s+(.*?.spec.ts):(\d+):\d+\s+›/m);
+    if (testMatch) {
+        loc.specFile = testMatch[1];
+        loc.testLine = testMatch[2];
+    }
 
-    // 2. Find specific Error Line (Stack Trace)
-    // at .../DocumentFormValidation.spec.ts:71:79
-    const errorMatch = logText.match(/at\s+.*[\/\\]([^\/\\]+\.spec\.ts):(\d+):(\d+)/);
+    // 2. Analyze Stack Trace for Root Cause vs Test Step
+    // Regex explanation:
+    // at ... (path/to/file.ts):Line:Col
+    // We allow paths starting with / (absolute), ~ (home), . (relative), or just word chars (relative pages/...)
+    const stackRegex = /at\s+(?:.*? \()?((?:[a-zA-Z]:\\|[\/~]|\.?\.\/|[\w_\-]+\/).*?):(\d+):(\d+)\)?/g;
+    let match;
+    let foundRoot = false;
 
-    if (testMatch || errorMatch) {
-        return {
-            file: testMatch ? testMatch[1] : (errorMatch ? errorMatch[1] : null),
-            testLine: testMatch ? testMatch[2] : null,
-            errorLine: errorMatch ? errorMatch[2] : null
-        };
+    while ((match = stackRegex.exec(logText)) !== null) {
+        const file = match[1];
+        const line = match[2];
+
+        // Ignore node_modules or internal runner code if you want cleaner logs
+        // But usually Playwright logs are already filtered to user code.
+
+        // The first valid user-code frame is our "Root Cause"
+        if (!foundRoot && !file.includes('node_modules')) {
+            loc.rootFile = file.split('/').pop(); // Save basename for display
+            // Resolve to absolute path to ensure we can read it later
+            loc.fullRootPath = path.resolve(process.cwd(), file);
+            loc.rootLine = line;
+            foundRoot = true;
+        }
+
+        // The first frame that matches our specFile is our "Test Step"
+        if (loc.specFile && file.endsWith(loc.specFile)) {
+            loc.stepLine = line;
+            // Once we find the spec entry point, we can usually stop or keep going
+        }
+    }
+
+    if (loc.specFile || loc.rootFile) {
+        return loc;
     }
     return null;
 }
@@ -185,23 +250,55 @@ function printDetailedFix(fixText, location) {
         GREEN: "\x1b[32m",
         YELLOW: "\x1b[33m",
         CYAN: "\x1b[36m",
+        BLUE: "\x1b[34m",
         GRAY: "\x1b[90m",
         WHITE: "\x1b[37m"
     };
 
+    // Try to parse JSON fix (Smart Mode)
+    let fixCode = fixText;
+    let targetLine = null;
+    let explanation = null;
+
+    try {
+        const parsed = JSON.parse(fixText);
+        if (parsed.code) {
+            fixCode = parsed.code;
+            targetLine = parsed.line_number;
+            explanation = parsed.reason;
+        }
+    } catch (e) {
+        // Not JSON, assume raw code string
+    }
+
     console.log("\n" + C.GRAY + "─".repeat(50) + C.RESET);
 
     if (location) {
-        if (location.file) console.log(`📄 File: ${C.BRIGHT}${location.file}${C.RESET}`);
-        if (location.testLine) console.log(`🧪 Test Start: ${C.CYAN}Line ${location.testLine}${C.RESET}`);
-        if (location.errorLine) console.log(`💥 Failure At: ${C.RED}Line ${location.errorLine}${C.RESET}`);
+        // Header: The Test Case
+        if (location.specFile) {
+            console.log(`📄 Test Context: ${C.BRIGHT}${location.specFile}${C.RESET}:${C.CYAN}${location.testLine || '?'}${C.RESET}`);
+        }
+
+        // The Root Cause (Deepest Code) - Priority Display
+        if (location.rootFile && location.rootLine) {
+            console.log(`💥 Runtime Error: ${C.RED}${location.rootFile}:${location.rootLine}${C.RESET}`);
+        }
+
+        // The Smart Target Definition
+        if (targetLine && location.rootFile) {
+            console.log(`🎯 Fix Target:    ${C.GREEN}${location.rootFile}:${targetLine}${C.RESET} (Definition)`);
+        } else if (location.stepLine && location.stepLine !== location.rootLine) {
+            console.log(`📍 Test Step:    ${C.YELLOW}Line ${location.stepLine}${C.RESET} (in spec)`);
+        }
+
         console.log(C.GRAY + "─".repeat(50) + C.RESET);
     }
 
     console.log(`${C.GREEN}${C.BRIGHT}✨ DEFLAKE SUGGESTION:${C.RESET}`);
+    if (explanation) console.log(`${C.GRAY}// ${explanation}${C.RESET}`);
 
-    // Manual Syntax Highlighting logic (Restored)
-    const lines = fixText.split('\n');
+    // Manual Syntax Highlighting logic
+    const lines = fixCode.split('\n');
     let insideCode = false;
 
     lines.forEach(line => {
@@ -213,11 +310,11 @@ function printDetailedFix(fixText, location) {
             // Simple syntax highlighting
             let colored = line
                 .replace(/(\/\/.*)/g, `${C.GRAY}$1${C.RESET}`) // Comments
-                .replace(/\b(const|let|var|await|async|function|return|page|expect|test)\b/g, `${C.YELLOW}$1${C.RESET}`) // Keywords
+                .replace(/\b(const|let|var|await|async|function|return|page|expect|test|class|extends|super|this)\b/g, `${C.YELLOW}$1${C.RESET}`) // Keywords
                 .replace(/('.*?')/g, `${C.GREEN}$1${C.RESET}`) // Strings '...'
                 .replace(/(".*?")/g, `${C.GREEN}$1${C.RESET}`) // Strings "..."
                 .replace(/(`.*?`)/g, `${C.GREEN}$1${C.RESET}`) // Template Check
-                .replace(/(\.locator|\.click|\.fill|\.toBe|\.toHaveText)/g, `${C.CYAN}$1${C.RESET}`); // Methods
+                .replace(/(\.locator|\.click|\.fill|\.toBe|\.toHaveText|\.goto|\.type)/g, `${C.CYAN}$1${C.RESET}`); // Methods
 
             console.log("  " + colored);
         } else {

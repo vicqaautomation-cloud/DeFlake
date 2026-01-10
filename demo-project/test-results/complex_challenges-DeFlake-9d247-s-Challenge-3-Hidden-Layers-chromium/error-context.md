@@ -1,0 +1,45 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - link "UITAP" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - list [ref=e5]:
+      - listitem [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /home
+      - listitem [ref=e8]:
+        - link "Resources" [ref=e9] [cursor=pointer]:
+          - /url: /resources
+  - generic [ref=e11]:
+    - heading "Hidden Layers" [level=3] [ref=e12]
+    - paragraph [ref=e13]: Some applications use DOM caching techniques. For example, if a user follows a multi step process and each step requires filling data into a form then forms may be cached at the client side along the way. It allows to quickly navigate back and forward through the steps without requesting data from a server. When form is cached it just pushed on-top of z-order stack. It means that an element may be still present in the DOM tree but overlapped with another layer of elements. In this case it is important that a test does not interact with inactive elements becasue they are invisible to a user.
+    - heading "Scenario" [level=4] [ref=e14]
+    - list [ref=e15]:
+      - listitem [ref=e16]: Record button click and then duplicate the button click step in your test.
+      - listitem [ref=e17]: Execute the test to make sure that green button can not be hit twice.
+    - heading "Playground" [level=4] [ref=e18]
+    - generic:
+      - button "Button" [active] [ref=e19] [cursor=pointer]
+      - button "Button" [ref=e20] [cursor=pointer]
+  - contentinfo [ref=e23]:
+    - generic [ref=e24]:
+      - generic [ref=e27]:
+        - link "Fork the website on GitHub" [ref=e28] [cursor=pointer]:
+          - /url: https://github.com/inflectra/ui-test-automation-playground
+        - text: .
+      - generic [ref=e29]:
+        - text: Supported by
+        - link "Rapise" [ref=e30] [cursor=pointer]:
+          - /url: https://www.inflectra.com/Rapise/
+        - text: test automation team. Copyright © 2020
+        - link "Inflectra Corporation" [ref=e31] [cursor=pointer]:
+          - /url: https://www.inflectra.com/
+        - text: .
+    - generic [ref=e32]:
+      - text: This work is licensed under the
+      - link "Apache License 2.0" [ref=e33] [cursor=pointer]:
+        - /url: https://www.apache.org/licenses/LICENSE-2.0
+      - text: .
+```

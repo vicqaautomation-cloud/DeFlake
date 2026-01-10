@@ -1,0 +1,28 @@
+
+> demo-project@1.0.0 test
+> playwright test
+
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] › tests/example.spec.js:4:1 › login button click
+[1A[2K  1) [chromium] › tests/example.spec.js:4:1 › login button click ───────────────────────────────────
+
+    TimeoutError: page.click: Timeout 2000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#login-btn')[22m
+
+
+       8 |
+       9 |     // This selector is BROKEN. It looks for #login-btn, but the real ID is #auth-submit
+    > 10 |     await page.click('#login-btn', { timeout: 2000 });
+         |                ^
+      11 | });
+      12 |
+        at /Users/hugo/Documents/Personal/DeFlake/demo-project/tests/example.spec.js:10:16
+
+    Error Context: test-results/example-login-button-click-chromium/error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] › tests/example.spec.js:4:1 › login button click ────────────────────────────────────

@@ -1,0 +1,41 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "UITAP" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - list [ref=e5]:
+      - listitem [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /home
+      - listitem [ref=e8]:
+        - link "Resources" [ref=e9] [cursor=pointer]:
+          - /url: /resources
+  - generic [ref=e11]:
+    - heading "Sample App" [level=3] [ref=e12]
+    - paragraph [ref=e13]: "Fill in and submit the form. For successfull login use any non-empty user name and `pwd` as password."
+    - generic [ref=e16]: User logged out.
+    - textbox "User Name" [ref=e19]
+    - textbox "********" [ref=e22]
+    - button "Log In" [ref=e25] [cursor=pointer]
+  - contentinfo [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e31]:
+        - link "Fork the website on GitHub" [ref=e32] [cursor=pointer]:
+          - /url: https://github.com/inflectra/ui-test-automation-playground
+        - text: .
+      - generic [ref=e33]:
+        - text: Supported by
+        - link "Rapise" [ref=e34] [cursor=pointer]:
+          - /url: https://www.inflectra.com/Rapise/
+        - text: test automation team. Copyright © 2020
+        - link "Inflectra Corporation" [ref=e35] [cursor=pointer]:
+          - /url: https://www.inflectra.com/
+        - text: .
+    - generic [ref=e36]:
+      - text: This work is licensed under the
+      - link "Apache License 2.0" [ref=e37] [cursor=pointer]:
+        - /url: https://www.apache.org/licenses/LICENSE-2.0
+      - text: .
+```

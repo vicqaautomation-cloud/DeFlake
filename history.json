@@ -1,5 +1,59 @@
 [
   {
+    "timestamp": "2026-01-10T14:35:23.654922",
+    "failing_line": "Line 20",
+    "fix": "{\n  \"code\": \"this.usernameInput = page.locator('text=Username');\",\n  \"line_number\": 12,\n  \"reason\": \"The locator for the username input field was incorrectly using an internal reference attribute. The correct locator should use the visible text 'Username' to identify the input field.\"\n}",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T14:30:12.194184",
+    "failing_line": "Line 20",
+    "fix": "{\n  \"code\": \"this.usernameInput = page.locator('#textbox[ref=\\\"e11\\\"]');\",\n  \"line_number\": 12,\n  \"reason\": \"The CSS selector for the username input field is missing a closing bracket. This causes a syntax error when parsing the selector.\"\n}",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T14:22:27.598720",
+    "failing_line": "Line 20",
+    "fix": "```typescript\nthis.usernameInput = page.locator('#user-name');\n```",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T14:20:16.057344",
+    "failing_line": "Line 20",
+    "fix": "```typescript\nthis.usernameInput = page.locator('textbox[ref=\"e11\"]');\n```",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T14:10:32.011100",
+    "failing_line": "Line 20",
+    "fix": "```typescript\nthis.usernameInput = page.locator('textbox[ref=\"e11\"]');\n```",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T14:07:45.491977",
+    "failing_line": "Line 20",
+    "fix": "```typescript\nthis.usernameInput = page.locator('textbox[ref=\"e11\"]');\n```",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T14:00:34.614487",
+    "failing_line": null,
+    "fix": "```javascript\n// Fixed Code\nawait this.page.locator('textbox[ref=\"e11\"]').fill(username);\n```",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T13:58:42.043399",
+    "failing_line": null,
+    "fix": "```javascript\n// Fixed Code\nconst usernameInput = page.locator('textbox[ref=\"e11\"]');\n```",
+    "tier": "standard"
+  },
+  {
+    "timestamp": "2026-01-10T13:51:10.094502",
+    "failing_line": null,
+    "fix": "```javascript\n// Fixed Code\nconst usernameInput = page.locator('text=Username');\n```",
+    "tier": "standard"
+  },
+  {
     "timestamp": "2026-01-02T08:42:31.677729",
     "log_path": "/Users/hugo/Documents/Personal/DeFlake/deflake_context/error_1767364949.log",
     "html_path": "/Users/hugo/Documents/Personal/DeFlake/deflake_context/snapshot_1767364949.html",

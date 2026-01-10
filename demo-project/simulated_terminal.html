@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DeFlake Terminal</title>
+    <style>
+        body {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            padding: 40px;
+            font-size: 18px;
+        }
+
+        .cmd {
+            color: #569cd6;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .log {
+            margin-bottom: 10px;
+        }
+
+        .success {
+            color: #4ec9b0;
+            margin-top: 30px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .fix-box {
+            border: 2px solid #ce9178;
+            padding: 20px;
+            margin-top: 10px;
+            color: #ce9178;
+            background: #1e1e1e;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+        }
+
+        .header {
+            color: #6a9955;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">Using DeFlake on "Challenge 1: Dynamic ID"...</div>
+
+    <div class="cmd">> npx deflake --log error.log --html failure.html</div>
+
+    <div class="log">🚑 DeFlake JS Client (Secure Mode)</div>
+    <div class="log">🧠 Consulting the Cloud Brain...</div>
+    <div class="log">🔒 Authenticating with API Key: test***</div>
+    <div class="log">📤 Sending context to: https://deflake-api.up.railway.app</div>
+
+    <div class="success">✅ FIX SUGGESTED:</div>
+    <div class="fix-box">
+        // The ID was dynamic (e.g. #a83f...), unreliable.<br>
+        // Suggested Robust Selector:<br><br>
+        button:has-text("Button with Dynamic ID")
+    </div>
+</body>
+
+</html>

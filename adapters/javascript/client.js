@@ -16,7 +16,7 @@ class DeFlakeClient {
         }
     }
 
-    async heal(logPath, htmlPath) {
+    async heal(logPath, htmlPath, failureLocation = null, sourceCode = null) {
         try {
             // 1. Validate Input Paths (Security: Prevent directory traversal outside of intended scope? 
             // Realistically, the user runs this on their own machine, but basic checks are good)
@@ -35,11 +35,15 @@ class DeFlakeClient {
             console.log(`🔒 Authenticating with API Key: ${this.apiKey.substring(0, 4)}***`);
             console.log(`📤 Sending context to: ${this.apiUrl}`);
 
-            const response = await axios.post(this.apiUrl, {
+            // Prepare payload
+            const payload = {
                 error_log: logContent,
                 html_snapshot: htmlContent,
-                // failing_line: ... (We'll add extraction logic later or pass via args)
-            }, {
+                failing_line: failureLocation ? `Line ${failureLocation.rootLine}` : null,
+                source_code: sourceCode
+            };
+
+            const response = await axios.post(this.apiUrl, payload, {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-API-KEY': this.apiKey

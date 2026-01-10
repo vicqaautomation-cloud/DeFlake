@@ -73,6 +73,7 @@ class HealRequest(BaseModel):
     error_log: str
     html_snapshot: str
     failing_line: str = None
+    source_code: str = None
 
 @app.get("/")
 def health_check():
@@ -118,7 +119,7 @@ def deflake_endpoint(request: HealRequest, creds: dict = Security(verify_quota_a
         # In a real version, we'd use BeautifulSoup to extract only the body or relevant div.
         trimmed_html = request.html_snapshot[:15000] + "\n...[TRUNCATED]..." if len(request.html_snapshot) > 15000 else request.html_snapshot
         
-        fix = client.heal(request.error_log, trimmed_html, request.failing_line)
+        fix = client.heal(request.error_log, trimmed_html, request.failing_line, request.source_code)
         
         # Increment usage ONLY if it wasn't a BYOK request and wasn't Master
         if creds["type"] == "standard":

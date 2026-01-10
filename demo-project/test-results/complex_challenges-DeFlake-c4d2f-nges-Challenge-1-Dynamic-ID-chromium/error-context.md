@@ -1,0 +1,43 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "UITAP" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - list [ref=e5]:
+      - listitem [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /home
+      - listitem [ref=e8]:
+        - link "Resources" [ref=e9] [cursor=pointer]:
+          - /url: /resources
+  - generic [ref=e11]:
+    - heading "Dynamic ID" [level=3] [ref=e12]
+    - paragraph [ref=e13]: Modern applications often generate dynamic IDs for elements. In this case ID is not a reliable attribute for using in element selector. By default many UI automation tools record IDs and this results in tests broken from the very beginning. An automation tool needs a way to instruct it to skip dynamic IDs when XPath is generated for an element.
+    - heading "Scenario" [level=4] [ref=e14]
+    - list [ref=e15]:
+      - listitem [ref=e16]: Record button click.
+      - listitem [ref=e17]: Then execute your test to make sure that ID is not used for button identification.
+    - heading "Playground" [level=4] [ref=e18]
+    - button "Button with Dynamic ID" [ref=e19] [cursor=pointer]
+  - contentinfo [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e25]:
+        - link "Fork the website on GitHub" [ref=e26] [cursor=pointer]:
+          - /url: https://github.com/inflectra/ui-test-automation-playground
+        - text: .
+      - generic [ref=e27]:
+        - text: Supported by
+        - link "Rapise" [ref=e28] [cursor=pointer]:
+          - /url: https://www.inflectra.com/Rapise/
+        - text: test automation team. Copyright © 2020
+        - link "Inflectra Corporation" [ref=e29] [cursor=pointer]:
+          - /url: https://www.inflectra.com/
+        - text: .
+    - generic [ref=e30]:
+      - text: This work is licensed under the
+      - link "Apache License 2.0" [ref=e31] [cursor=pointer]:
+        - /url: https://www.apache.org/licenses/LICENSE-2.0
+      - text: .
+```

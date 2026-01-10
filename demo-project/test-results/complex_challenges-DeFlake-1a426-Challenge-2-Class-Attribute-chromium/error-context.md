@@ -1,0 +1,58 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "UITAP" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - list [ref=e5]:
+      - listitem [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /home
+      - listitem [ref=e8]:
+        - link "Resources" [ref=e9] [cursor=pointer]:
+          - /url: /resources
+  - generic [ref=e11]:
+    - heading "Class Attribute" [level=3] [ref=e12]
+    - paragraph [ref=e13]: Class attribute of an element may contain more than one class reference. E.g.
+    - code [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]: <button
+        - text: class
+        - generic [ref=e18]: ="btn btn-primary btn-test"
+        - text: ">"
+    - paragraph [ref=e19]: "XPath selector relying on a class must be well formed. For example, the following will not work:"
+    - code [ref=e21]: //button[@class='btn-primary']
+    - paragraph [ref=e22]: Correct variant is
+    - code [ref=e24]: //button[contains(concat(' ', normalize-space(@class), ' '), ' btn-primary ')]
+    - heading "Scenario" [level=4] [ref=e25]
+    - list [ref=e26]:
+      - listitem [ref=e27]: Record primary (blue) button click and press ok in alert popup.
+      - listitem [ref=e28]:
+        - text: Then execute your test to make sure that it can identify the button using
+        - code [ref=e29]: btn-primary
+        - text: class.
+    - heading "Playground" [level=4] [ref=e30]
+    - button "Button" [ref=e31] [cursor=pointer]
+    - button "Button" [ref=e32] [cursor=pointer]
+    - button "Button" [ref=e33] [cursor=pointer]
+  - contentinfo [ref=e35]:
+    - generic [ref=e36]:
+      - generic [ref=e39]:
+        - link "Fork the website on GitHub" [ref=e40] [cursor=pointer]:
+          - /url: https://github.com/inflectra/ui-test-automation-playground
+        - text: .
+      - generic [ref=e41]:
+        - text: Supported by
+        - link "Rapise" [ref=e42] [cursor=pointer]:
+          - /url: https://www.inflectra.com/Rapise/
+        - text: test automation team. Copyright © 2020
+        - link "Inflectra Corporation" [ref=e43] [cursor=pointer]:
+          - /url: https://www.inflectra.com/
+        - text: .
+    - generic [ref=e44]:
+      - text: This work is licensed under the
+      - link "Apache License 2.0" [ref=e45] [cursor=pointer]:
+        - /url: https://www.apache.org/licenses/LICENSE-2.0
+      - text: .
+```

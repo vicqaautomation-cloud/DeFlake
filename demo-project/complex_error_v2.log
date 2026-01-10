@@ -1,0 +1,102 @@
+
+Running 5 tests using 5 workers
+
+[1A[2K[1/5] [chromium] › tests/complex_challenges.spec.js:24:9 › DeFlake Complex Challenges › Challenge 4: Class Change
+[1A[2K[2/5] [chromium] › tests/complex_challenges.spec.js:11:9 › DeFlake Complex Challenges › Challenge 2: Class Attribute
+[1A[2K[3/5] [chromium] › tests/complex_challenges.spec.js:17:9 › DeFlake Complex Challenges › Challenge 3: Hidden Layers
+[1A[2K[4/5] [chromium] › tests/complex_challenges.spec.js:41:9 › DeFlake Complex Challenges › Challenge 5: Text Match
+[1A[2K[5/5] [chromium] › tests/complex_challenges.spec.js:5:9 › DeFlake Complex Challenges › Challenge 1: Dynamic ID
+[1A[2K[chromium] › tests/complex_challenges.spec.js:5:9 › DeFlake Complex Challenges › Challenge 1: Dynamic ID
+Saved HTML to failure-Challenge-1:-Dynamic-ID.html
+
+[1A[2K[chromium] › tests/complex_challenges.spec.js:24:9 › DeFlake Complex Challenges › Challenge 4: Class Change
+Saved HTML to failure-Challenge-4:-Class-Change.html
+
+[1A[2K[chromium] › tests/complex_challenges.spec.js:11:9 › DeFlake Complex Challenges › Challenge 2: Class Attribute
+Saved HTML to failure-Challenge-2:-Class-Attribute.html
+
+[1A[2K  1) [chromium] › tests/complex_challenges.spec.js:5:9 › DeFlake Complex Challenges › Challenge 1: Dynamic ID 
+
+    TimeoutError: page.click: Timeout 2000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#legacy-static-id')[22m
+
+
+       6 |         await page.goto('http://uitestingplayground.com/dynamicid');
+       7 |         // FAIL: This ID doesn't exist. Real button has dynamic ID.
+    >  8 |         await page.click('#legacy-static-id', { timeout: 2000 });
+         |                    ^
+       9 |     });
+      10 |
+      11 |     test('Challenge 2: Class Attribute', async ({ page }) => {
+        at /Users/hugo/Documents/Personal/DeFlake/demo-project/tests/complex_challenges.spec.js:8:20
+
+    Error Context: test-results/complex_challenges-DeFlake-c4d2f-nges-Challenge-1-Dynamic-ID-chromium/error-context.md
+
+
+[1A[2K  2) [chromium] › tests/complex_challenges.spec.js:11:9 › DeFlake Complex Challenges › Challenge 2: Class Attribute 
+
+    TimeoutError: page.click: Timeout 2000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.btn.class1.class2.btn-warning.fix-this-selector')[22m
+
+
+      12 |         await page.goto('http://uitestingplayground.com/classattr');
+      13 |         // FAIL: The class includes dynamic gibberish.
+    > 14 |         await page.click('.btn.class1.class2.btn-warning.fix-this-selector', { timeout: 2000 });
+         |                    ^
+      15 |     });
+      16 |
+      17 |     test('Challenge 3: Hidden Layers', async ({ page }) => {
+        at /Users/hugo/Documents/Personal/DeFlake/demo-project/tests/complex_challenges.spec.js:14:20
+
+    Error Context: test-results/complex_challenges-DeFlake-1a426-Challenge-2-Class-Attribute-chromium/error-context.md
+
+
+[1A[2K  3) [chromium] › tests/complex_challenges.spec.js:24:9 › DeFlake Complex Challenges › Challenge 4: Class Change 
+
+    TimeoutError: page.fill: Timeout 2000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="old_username"]')[22m
+
+
+      25 |         await page.goto('http://uitestingplayground.com/sampleapp');
+      26 |         // FAIL: Real name is "UserName"
+    > 27 |         await page.fill('input[name="old_username"]', 'myUser', { timeout: 2000 });
+         |                    ^
+      28 |     });
+      29 |
+      30 |
+        at /Users/hugo/Documents/Personal/DeFlake/demo-project/tests/complex_challenges.spec.js:27:20
+
+    Error Context: test-results/complex_challenges-DeFlake-c6302-es-Challenge-4-Class-Change-chromium/error-context.md
+
+
+[1A[2K[chromium] › tests/complex_challenges.spec.js:17:9 › DeFlake Complex Challenges › Challenge 3: Hidden Layers
+Saved HTML to failure-Challenge-3:-Hidden-Layers.html
+
+[1A[2K  4) [chromium] › tests/complex_challenges.spec.js:17:9 › DeFlake Complex Challenges › Challenge 3: Hidden Layers 
+
+    TimeoutError: page.click: Timeout 2000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#blue-layer-button-old-id')[22m
+
+
+      19 |         await page.click('#greenButton');
+      20 |         // FAIL: Trying to click the green button again (it's covered now)
+    > 21 |         await page.click('#blue-layer-button-old-id', { timeout: 2000 });
+         |                    ^
+      22 |     });
+      23 |
+      24 |     test('Challenge 4: Class Change', async ({ page }) => {
+        at /Users/hugo/Documents/Personal/DeFlake/demo-project/tests/complex_challenges.spec.js:21:20
+
+    Error Context: test-results/complex_challenges-DeFlake-9d247-s-Challenge-3-Hidden-Layers-chromium/error-context.md
+
+
+[1A[2K  4 failed
+    [chromium] › tests/complex_challenges.spec.js:5:9 › DeFlake Complex Challenges › Challenge 1: Dynamic ID 
+    [chromium] › tests/complex_challenges.spec.js:11:9 › DeFlake Complex Challenges › Challenge 2: Class Attribute 
+    [chromium] › tests/complex_challenges.spec.js:17:9 › DeFlake Complex Challenges › Challenge 3: Hidden Layers 
+    [chromium] › tests/complex_challenges.spec.js:24:9 › DeFlake Complex Challenges › Challenge 4: Class Change 
+  1 passed (3.9s)

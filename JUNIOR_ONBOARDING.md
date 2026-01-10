@@ -38,30 +38,47 @@ We don't write spaghetti code here! Let's organize our tests using POM.
 mkdir pages
 ```
 
-### 2. Create a Login Page Object (`pages/LoginPage.ts`)
-Creates a class that represents the Login Page logic.
+### 2. Create the Base Page (`pages/BasePage.ts`)
+First, let's create a base class to hold common logic. This is a **Best Practice** for scalable frameworks.
 ```typescript
-import { expect, type Locator, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
-export class LoginPage {
-  readonly page: Page;
+export class BasePage {
+    readonly page: Page;
+
+    constructor(page: Page) {
+        this.page = page;
+    }
+
+    // Common method for all pages
+    async navigateTo(url: string) {
+        await this.page.goto(url);
+    }
+}
+```
+
+### 3. Create a Login Page Object (`pages/LoginPage.ts`)
+Now create the Login Page inheriting from `BasePage`.
+```typescript
+import { type Locator, type Page } from '@playwright/test';
+import { BasePage } from './BasePage';
+
+export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page); // Call the parent constructor
+    
     // ❌ INTENTIONAL ERROR: Using a weak selector to trigger DeFlake later!
     this.usernameInput = page.locator('#user-name-broken'); 
     this.passwordInput = page.locator('#password');
     this.loginButton = page.locator('#login-button');
   }
 
-  async goto() {
-    await this.page.goto('https://www.saucedemo.com/');
-  }
-
-  async login(username: string, pass: string) {
+  async performLogin(username: string, pass: string) {
+    await this.navigateTo('https://www.saucedemo.com/');
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(pass);
     await this.loginButton.click();
@@ -69,7 +86,7 @@ export class LoginPage {
 }
 ```
 
-### 3. Create the Test (`tests/login.spec.ts`)
+### 4. Create the Test (`tests/login.spec.ts`)
 ```typescript
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
@@ -78,8 +95,8 @@ test.describe('SauceDemo Login', () => {
     test('should login successfully', async ({ page }) => {
       const loginPage = new LoginPage(page);
       
-      await loginPage.goto();
-      await loginPage.login('standard_user', 'secret_sauce');
+      // We use the method defined in POM
+      await loginPage.performLogin('standard_user', 'secret_sauce');
       
       // Verify we are redirected (Product page)
       await expect(page).toHaveURL(/.*inventory.html/);
