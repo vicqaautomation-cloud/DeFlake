@@ -110,15 +110,42 @@ def deflake_endpoint(request: HealRequest, creds: dict = Security(verify_quota_a
     openai_key = creds.get("byok")
     
     # We use mock=True for the demo unless OpenAI key is present (real or BYOK)
-    # Actually, LLMClient handles env logic. We just need to pass the explicit key if BYOK.
+    # Real AI Mode
     client = LLMClient(mock=False, openai_api_key=openai_key)
     
     try:
-        fix = client.heal(request.error_log, request.html_snapshot, request.failing_line)
+        # NAIVE MVP TRIMMING: Limit HTML to 15k chars to avoid 429 errors
+        # In a real version, we'd use BeautifulSoup to extract only the body or relevant div.
+        trimmed_html = request.html_snapshot[:15000] + "\n...[TRUNCATED]..." if len(request.html_snapshot) > 15000 else request.html_snapshot
+        
+        fix = client.heal(request.error_log, trimmed_html, request.failing_line)
         
         # Increment usage ONLY if it wasn't a BYOK request and wasn't Master
         if creds["type"] == "standard":
             increment_usage(creds["key"])
+
+        # Save to History
+        import datetime
+        history_entry = {
+            "timestamp": datetime.datetime.now().isoformat(),
+            "failing_line": request.failing_line,
+            "fix": fix,
+            "tier": creds["type"]
+        }
+        
+        try:
+            history_data = []
+            if os.path.exists(HISTORY_FILE):
+                with open(HISTORY_FILE, "r") as f:
+                    history_data = json.load(f)
+            
+            history_data.insert(0, history_entry) # Prepend
+            history_data = history_data[:50] # Keep last 50
+            
+            with open(HISTORY_FILE, "w") as f:
+                json.dump(history_data, f, indent=2)
+        except Exception as e:
+            print(f"Failed to save history: {e}")
             
         return {"fix": fix, "status": "success"}
     except Exception as e:

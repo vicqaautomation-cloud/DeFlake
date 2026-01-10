@@ -55,13 +55,37 @@ pytest tests/ --deflake
 ### Option B: JavaScript (Node.js / Cypress)
 Perfect for frontend developers and QA Engineers on Windows/Mac.
 
-```bash
-# 1. Install the client
-cd adapters/javascript
-npm install
+## 🚀 Quick Start (Zero Config)
 
-# 2. Analyze a failure
-node cli.js --log error.log --html snapshot.html
+DeFlake is designed to be a "wrapper" around your existing test command.
+
+1.  **Install** (in your test project):
+    ```bash
+    npm install deflake --save-dev
+    ```
+
+2.  **Run with DeFlake**:
+    Simply prepend `npx deflake` to your usual test command:
+    ```bash
+    # Before
+    npx playwright test
+
+    # After (Magic 🪄)
+    npx deflake npx playwright test
+    ```
+
+    DeFlake will:
+    1.  Run your tests.
+    2.  If they fail, capture the logs and find your HTML report.
+    3.  Analyze the error with AI.
+    4.  Print the suggested code fix in your terminal.
+
+## 🔧 Manual Usage
+
+If you prefer to run it manually against existing files:
+
+```bash
+npx deflake --log error.log --html playwright-report/index.html
 ```
 
 ---

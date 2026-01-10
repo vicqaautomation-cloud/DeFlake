@@ -37,6 +37,103 @@ $env:DEFLAKE_API_URL="https://deflake-api.up.railway.app"`
   );
 }
 
+function UserDashboard() {
+  const [apiKey, setApiKey] = useState('');
+  const [stats, setStats] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const checkStats = async () => {
+    if (!apiKey) return;
+    setLoading(true);
+    setError(null);
+    try {
+      // Fetch Stats
+      const statsRes = await fetch('http://localhost:8000/api/user/usage', {
+        headers: { 'X-API-KEY': apiKey }
+      });
+      if (!statsRes.ok) throw new Error('Invalid API Key');
+      const statsData = await statsRes.json();
+      setStats(statsData);
+
+      // Fetch History (Public endpoint for now, but good to have)
+      const historyRes = await fetch('http://localhost:8000/api/history');
+      if (historyRes.ok) {
+        const historyData = await historyRes.json();
+        setHistory(historyData);
+      }
+    } catch (err) {
+      setError(err.message);
+      setStats(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-zinc-900 rounded-xl border border-zinc-700 p-6 max-w-2xl mx-auto">
+      {!stats ? (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Enter API Key (e.g. key-123)"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="flex-1 bg-zinc-950 border border-zinc-700 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-primary"
+          />
+          <button
+            onClick={checkStats}
+            disabled={loading}
+            className="bg-primary text-zinc-900 px-4 py-2 rounded-md font-bold text-sm hover:bg-primary/90 disabled:opacity-50"
+          >
+            {loading ? '...' : 'Check'}
+          </button>
+        </div>
+      ) : (
+        <div className="text-left">
+          <div className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
+            <h3 className="font-bold text-white text-lg">Dashboard</h3>
+            <button onClick={() => setStats(null)} className="text-xs text-zinc-500 hover:text-white">Logout</button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="bg-zinc-800 p-4 rounded-lg">
+              <p className="text-zinc-500 text-xs uppercase mb-1">Current Plan</p>
+              <p className="text-2xl font-mono text-primary uppercase">{stats.tier}</p>
+            </div>
+            <div className="bg-zinc-800 p-4 rounded-lg">
+              <p className="text-zinc-500 text-xs uppercase mb-1">Monthly Usage</p>
+              <p className="text-2xl font-mono text-white">{stats.usage} <span className="text-zinc-500 text-base">/ {stats.limit}</span></p>
+            </div>
+          </div>
+
+          <h4 className="font-bold text-zinc-300 mb-4 text-sm uppercase tracking-wider">Recent Activity</h4>
+          <div className="space-y-3">
+            {history.length === 0 ? (
+              <p className="text-zinc-500 text-sm italic">No fixes recorded yet.</p>
+            ) : (
+              history.slice(0, 5).map((entry, i) => (
+                <div key={i} className="bg-zinc-950 border border-zinc-800 p-3 rounded-lg text-sm">
+                  <div className="flex justify-between text-zinc-500 text-xs mb-2">
+                    <span>{new Date(entry.timestamp).toLocaleString()}</span>
+                    <span className="bg-zinc-800 px-2 rounded text-zinc-300">{entry.tier}</span>
+                  </div>
+                  {entry.failing_line && <div className="font-mono text-red-400 mb-1 line-clamp-1">{entry.failing_line}</div>}
+                  <div className="font-mono text-green-400 opacity-80 line-clamp-2 text-xs border-l-2 border-green-500/30 pl-2">
+                    {entry.fix}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+      {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+    </div>
+  );
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState('playwright');
 
@@ -118,6 +215,14 @@ services: [
           </div>
 
           <SetupTabs />
+        </div>
+      </section>
+
+      {/* User Dashboard Section */}
+      <section className="py-12 border-b border-zinc-800 bg-zinc-950">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-2xl font-bold mb-6">User Dashboard</h2>
+          <UserDashboard />
         </div>
       </section>
 

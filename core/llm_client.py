@@ -30,39 +30,32 @@ class LLMClient:
         Sends the error, HTML, and optional source code to the LLM to ask for a fix.
         """
         if self.mock:
+                # Mock output for testing
             if failing_line:
-                # Mock rewriting the line
-                return '    page.click("button[data-testid=\'submit-btn\']")'
-            return (
-                "/* DeFlake Mock Response */\n"
-                "/* The button ID changed from #submit-button to .btn-primary-2026 */\n"
-                "button[data-testid='submit-btn']"
-            )
+                return "```javascript\npage.locator('button[data-testid=\"submit-btn\"]').click();\n```"
+            return "```javascript\n// Selector update\npage.locator('.btn-primary-2026');\n```"
 
         system_prompt = (
-            "You are DeFlake, an expert QA Engineer and Test Automation specialist. "
-            "Your goal is to fix broken Playwright/Selenium tests.\n"
-            "You will be given an ERROR LOG and an HTML SNAPSHOT of the page.\n"
-            "If provided, you will also receive the FAILING LINE of code.\n"
-            "Analyze why the test failed (e.g., element not found, selector changed).\n"
-            "Identify the target element in the HTML.\n"
-            "If a failing line is provided, return the COMPLETE NEW LINE of code to replace it.\n"
-            "If no failing line is provided, return just the CSS selector.\n"
-            "PRIORITIZE robust selectors in this order:\n"
-            "1. data-testid or data-cy attributes (Best practice).\n"
-            "2. Unique IDs (if likely stable, avoid dynamic IDs like user-123).\n"
-            "3. Unique Class combinations.\n"
-            "4. Accessibility attributes (aria-label, placeholder).\n"
-            "5. Text content (e.g., text='Login').\n"
-            "6. XPath (ONLY as a last resort, and MUST be relative/attribute-based. NEVER return absolute XPaths like /html/body...).\n"
-            "If the element cannot be confidently located (e.g., completely dynamic, no stable attributes, or ambiguous),\n"
-            "return EXACTLY this string format: '⚠️ UNABLE TO FIX: [Reason]. Please ask developers to add a data-testid to this element.'\n"
-            "Return ONLY the code/selector or the failure message."
+            "You are DeFlake, a code-repairing AI. Your job is to fix broken Playwright tests.\n"
+            "BE EXTREMELY CONCISE. Do not explain the error unless it is ambiguous.\n"
+            "1. IDENTIFY the specific failing line from the logs/context.\n"
+            "2. GENERATE the corrected line of code using robust selectors (data-testid > id > text).\n"
+            "3. OUTPUT FORMAT:\n"
+            "```javascript\n"
+            "// Fixed Code\n"
+            "<your fixed line here>\n"
+            "```\n"
+            "If the fix involves a selector change, just provide the new selector line or const.\n"
+            "If you cannot fix it, return exactly: '⚠️ UNABLE TO FIX: [Short Reason].'"
         )
 
-        user_content = f"Error Log:\n{error_log}\n\nHTML Snapshot:\n{html_snapshot}"
+        user_content = "Error Log:\n{error_log}\n\nHTML Context:\n{html_snapshot}"
+        
+        inputs = {"error_log": error_log, "html_snapshot": html_snapshot}
+        
         if failing_line:
-            user_content += f"\n\nFailing Line:\n{failing_line}"
+            user_content += "\n\nFailing Line:\n{failing_line}"
+            inputs["failing_line"] = failing_line
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
@@ -70,5 +63,5 @@ class LLMClient:
         ])
 
         chain = prompt | self.llm
-        response = chain.invoke({"error_log": error_log, "html_snapshot": html_snapshot})
+        response = chain.invoke(inputs)
         return response.content.strip()
