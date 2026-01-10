@@ -5,7 +5,7 @@ require('dotenv').config();
 
 class DeFlakeClient {
     constructor(apiUrl, apiKey) {
-        this.apiUrl = apiUrl || 'http://localhost:8000/api/deflake';
+        this.apiUrl = apiUrl || process.env.DEFLAKE_API_URL || 'http://localhost:8000/api/deflake';
         this.apiKey = apiKey || process.env.DEFLAKE_API_KEY;
 
         if (!this.apiKey) {
